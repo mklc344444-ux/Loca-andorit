@@ -1,0 +1,40 @@
+name: Loca Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extract source
+        run: |
+          mkdir -p build-source
+          unzip -o Loca_Ses_Testi_Kaynak.zip -d build-source
+
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;34.0.0"
+
+      - name: Build APK
+        working-directory: build-source
+        run: gradle assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Loca-APK
+          path: build-source/build/outputs/apk/debug/*.apk
+          
